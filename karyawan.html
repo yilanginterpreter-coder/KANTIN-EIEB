@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>KANTIN EIEB</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#e91e8c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="KANTIN EIEB">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--pink:#e91e8c;--pink-light:#fce4ec;--pink-mid:#f48fb1;--pink-dark:#c2185b;--bg:#fff8fb;--white:#fff;--text:#333;--text2:#777;--border:#f0d0e0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+.header{background:linear-gradient(135deg,var(--pink),var(--pink-dark));padding:12px 16px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(233,30,140,0.3)}
+.header-top{display:flex;align-items:center;justify-content:space-between}
+.header h1{color:#fff;font-size:17px;font-weight:700;letter-spacing:1px}
+.header p{color:rgba(255,255,255,0.85);font-size:11px;margin-top:1px}
+.saldo-chip{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);border-radius:20px;padding:4px 12px;color:#fff;font-size:13px;font-weight:700;cursor:pointer}
+.saldo-chip.low{background:rgba(255,50,50,0.4);border-color:rgba(255,100,100,0.6);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.online-bar{background:rgba(255,255,255,0.15);padding:5px 16px;display:flex;align-items:center;gap:8px}
+.online-avatars{display:flex;gap:-4px}
+.online-dot{width:8px;height:8px;background:#4caf50;border-radius:50%;display:inline-block;margin-right:4px}
+.order-bar{padding:7px 16px;text-align:center;font-size:13px;font-weight:600}
+.order-bar.open{background:#e8f5e9;color:#2e7d32}
+.order-bar.closed{background:#fdecea;color:#c62828}
+.tab-content{display:none;padding:16px;animation:fadeIn 0.2s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 12px rgba(233,30,140,0.1)}
+.bottom-nav button{flex:1;padding:10px 4px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--text2);font-family:inherit;transition:all 0.2s}
+.bottom-nav button.active{color:var(--pink)}
+.bottom-nav button .icon{font-size:22px}
+.bottom-nav button.active .icon{transform:scale(1.15)}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(233,30,140,0.06)}
+.card-title{font-size:15px;font-weight:700;color:var(--pink-dark);margin-bottom:12px}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);outline:none;transition:border 0.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--pink)}
+input[readonly]{background:#fdf0f5;color:var(--text2)}
+textarea{resize:none}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.btn-pink{background:linear-gradient(135deg,var(--pink),var(--pink-dark));color:#fff;box-shadow:0 4px 12px rgba(233,30,140,0.3)}
+.btn-pink:disabled{background:#ddd;box-shadow:none;cursor:not-allowed}
+.btn-outline{background:#fff;border:1.5px solid var(--pink);color:var(--pink)}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-success{background:#e8f5e9;color:#2e7d32}
+.badge-danger{background:#fdecea;color:#c62828}
+.badge-pink{background:var(--pink-light);color:var(--pink-dark)}
+.badge-info{background:#e3f2fd;color:#1565c0}
+.badge-warning{background:#fff8e1;color:#f57f17}
+.alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;text-align:center;font-weight:500}
+.alert-success{background:#e8f5e9;color:#2e7d32}
+.alert-danger{background:#fdecea;color:#c62828}
+.avatar-wrap{position:relative;width:90px;height:90px;margin:0 auto 12px;cursor:pointer}
+.avatar-img{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--pink);box-shadow:0 4px 12px rgba(233,30,140,0.25)}
+.avatar-default{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--pink-dark));display:flex;align-items:center;justify-content:center;font-size:32px;border:3px solid var(--pink-dark)}
+.avatar-edit-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;border-radius:50%;background:var(--pink);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 6px rgba(0,0,0,0.2)}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.menu-item{background:#fff;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+.menu-item.selected{border-color:var(--pink);box-shadow:0 2px 8px rgba(233,30,140,0.2)}
+.menu-item-img{width:100%;height:90px;object-fit:cover;background:#fdf0f5;display:flex;align-items:center;justify-content:center;font-size:28px}
+.menu-item-img img{width:100%;height:90px;object-fit:cover}
+.menu-item-body{padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.menu-item-name{font-size:11px;font-weight:700;color:var(--text);line-height:1.3}
+.menu-item-price{font-size:11px;font-weight:700;color:var(--pink)}
+.selected-check{font-size:14px;display:none}
+.menu-item.selected .selected-check{display:inline}
+.waktu-label{font-size:13px;font-weight:700;color:var(--pink-dark);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.pesanan-item{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.profile-info{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.profile-info:last-child{border:none}
+.profile-info span:first-child{color:var(--text2)}
+.profile-info span:last-child{font-weight:600}
+.empty{text-align:center;padding:2rem;color:var(--text2);font-size:14px}
+.empty-icon{font-size:40px;margin-bottom:8px}
+.install-banner{background:linear-gradient(135deg,var(--pink-light),#fce4ec);border:1px solid var(--pink-mid);border-radius:14px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.install-banner button{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
+.toggle-group{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.toggle-btn{padding:10px;border:1.5px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);font-family:inherit;text-align:center;transition:all 0.2s}
+.toggle-btn.active{border-color:var(--pink);background:var(--pink-light);color:var(--pink-dark)}
+.online-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.online-card{text-align:center;padding:10px 6px;background:#fff;border:1px solid var(--border);border-radius:12px}
+.online-card-avatar{width:44px;height:44px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--pink),var(--pink-dark))}
+.online-card-name{font-size:9px;font-weight:600;color:var(--text);line-height:1.2}
+.saldo-card{background:linear-gradient(135deg,var(--pink),var(--pink-dark));border-radius:16px;padding:16px;margin-bottom:12px;color:#fff}
+.saldo-amount{font-size:28px;font-weight:800;margin:4px 0}
+.saldo-card.low{background:linear-gradient(135deg,#f44336,#b71c1c)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>🍱 KANTIN EIEB</h1>
+      <p id="tanggal-header"></p>
+    </div>
+    <div id="saldo-chip" class="saldo-chip">¥ —</div>
+  </div>
+  <div class="online-bar">
+    <span class="online-dot"></span>
+    <span id="online-count" style="color:rgba(255,255,255,0.9);font-size:12px">0 karyawan online</span>
+  </div>
+</div>
+<div id="order-bar" class="order-bar closed">🔒 Order Sedang Ditutup</div>
+<div id="alert-global" style="padding:0 16px"></div>
+
+<!-- TAB MENU -->
+<div id="tab-menu" class="tab-content active">
+  <div id="install-banner" class="install-banner" style="display:none">
+    <div style="font-size:28px;flex-shrink:0">📲</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--pink-dark)">Install Aplikasi</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Tambahkan ke homescreen HP kamu!</div></div>
+    <button onclick="installApp()">Install</button>
+  </div>
+  <!-- ONLINE USERS BANNER -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--pink-dark)">👥 Sedang Online</div>
+      <div id="online-count-badge" style="background:var(--pink);color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700">0</div>
+    </div>
+    <div id="online-users-list" style="display:flex;flex-wrap:wrap;gap:8px">
+      <div style="font-size:12px;color:var(--text2)">Belum ada yang online...</div>
+    </div>
+  </div>
+
+  <div id="menu-display"></div>
+</div>
+
+<!-- TAB PESAN -->
+<div id="tab-pesan" class="tab-content">
+  <div id="alert-form"></div>
+  <div id="closed-notice" style="display:none">
+    <div class="card" style="text-align:center;padding:2rem">
+      <div style="font-size:48px;margin-bottom:8px">🔒</div>
+      <div style="font-size:16px;font-weight:700;color:#c62828;margin-bottom:6px">Order Ditutup</div>
+      <div style="font-size:13px;color:var(--text2)">Tunggu hingga order dibuka kembali</div>
+    </div>
+  </div>
+  <div id="form-pesan">
+    <!-- SALDO INFO -->
+    <div id="saldo-card-pesan" class="saldo-card">
+      <div style="font-size:12px;opacity:0.85">Saldo Kamu</div>
+      <div class="saldo-amount" id="saldo-display-pesan">¥ —</div>
+      <div style="font-size:11px;opacity:0.75" id="saldo-after">Setelah pesan: ¥ —</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">👤 Data Karyawan</div>
+      <div class="form-group">
+        <label>ID Card</label>
+        <input type="text" id="id-card" placeholder="Masukkan ID Card...">
+      </div>
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" id="nama-input" readonly placeholder="Otomatis terisi...">
+      </div>
+      <div class="form-group" style="margin-bottom:4px">
+        <label>Departemen</label>
+        <input type="text" id="dept-input" readonly placeholder="Otomatis terisi...">
+      </div>
+      <div id="status-karyawan" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🍽️ Pilih Menu</div>
+      <div id="menu-form-display"></div>
+      <div id="total-harga" style="margin-top:12px;padding:10px 14px;background:var(--pink-light);border-radius:10px;font-size:14px;font-weight:700;color:var(--pink-dark);text-align:center">Total: ¥0</div>
+    </div>
+
+    <!-- TAKE AWAY / MAKAN DI TEMPAT -->
+    <div class="card">
+      <div class="card-title">🥡 Cara Makan</div>
+      <div class="toggle-group">
+        <button class="toggle-btn active" id="btn-ditempat" onclick="setCaraMakan('ditempat')">🍽️ Makan di Tempat</button>
+        <button class="toggle-btn" id="btn-takeaway" onclick="setCaraMakan('takeaway')">🥡 Take Away</button>
+      </div>
+      <div id="takeaway-section" style="display:none">
+        <div class="form-group">
+          <label>Pilih Lokasi Kamu</label>
+          <select id="lokasi-select">
+            <option value="">-- Pilih Lokasi --</option>
+          </select>
+        </div>
+        <div id="takeaway-status"></div>
+      </div>
+    </div>
+
+    <!-- SENDOK / SARUNG TANGAN -->
+    <div class="card">
+      <div class="card-title">♻️ Alat Makan (Opsional)</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Hemat plastik = jaga lingkungan 🌿</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
+          <input type="checkbox" id="pakai-sendok" style="width:18px;height:18px;accent-color:var(--pink)">
+          <div><div style="font-size:13px;font-weight:600">🥄 Pakai Sendok Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sendok plastik</div></div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
+          <input type="checkbox" id="pakai-sarung" style="width:18px;height:18px;accent-color:var(--pink)">
+          <div><div style="font-size:13px;font-weight:600">🧤 Pakai Sarung Tangan Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sarung tangan</div></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚗 Cara Makan</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div id="btn-ditempat" onclick="pilihCaraMakan('ditempat')" style="border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🍽️</div>
+          <div style="font-size:13px;font-weight:700;margin-top:4px">Makan di Tempat</div>
+        </div>
+        <div id="btn-takeaway" onclick="pilihCaraMakan('takeaway')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🥡</div>
+          <div style="font-size:13px;font-weight:700;margin-top:4px">Take Away</div>
+        </div>
+      </div>
+      <div id="lokasi-section" style="display:none">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Pilih Lokasi Kamu</div>
+        <select id="lokasi-select">
+          <option value="">-- Pilih Lokasi --</option>
+        </select>
+        <div id="takeaway-status" style="margin-top:8px;font-size:13px;font-weight:600"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🥄 Perlengkapan Makan</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Opsional — pilih jika butuh. Demi lingkungan, kurangi plastik ya! 🌿</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="btn-sendok" onclick="togglePerlengkapan('sendok')" style="border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:28px">🥄</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">Sendok Plastik</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>
+        </div>
+        <div id="btn-sarung" onclick="togglePerlengkapan('sarung')" style="border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:28px">🧤</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">Sarung Tangan</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💬 Saran & Keluhan</div>
+      <div class="form-group"><label>Saran (opsional)</label><input type="text" id="saran" placeholder="Saran untuk menu..."></div>
+      <div class="form-group" style="margin-bottom:0"><label>Keluhan (opsional)</label><textarea id="keluhan" rows="2" placeholder="Keluhan tentang makanan..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥄 Peralatan Makan (Opsional)</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Pilih jika butuh — skip kalau tidak perlu, bantu kurangi sampah plastik 🌿</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="btn-sendok" onclick="togglePeralatan('sendok')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🥄</div>
+          <div style="font-size:13px;font-weight:600;margin-top:4px">Sendok</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Plastik sekali pakai</div>
+        </div>
+        <div id="btn-sarung" onclick="togglePeralatan('sarung')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🧤</div>
+          <div style="font-size:13px;font-weight:600;margin-top:4px">Sarung Tangan</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Plastik sekali pakai</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-pink" id="btn-submit">Kirim Pesanan 🌸</button>
+  </div>
+
+  <div id="sukses-pesan" style="display:none">
+    <div class="card" style="text-align:center;padding:2.5rem 1rem">
+      <div style="font-size:56px;margin-bottom:12px">✅</div>
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">Pesanan Terkirim!</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">Pesananmu sudah diterima. Terima kasih! 🌸</div>
+      <div id="sukses-saldo" style="font-size:14px;font-weight:700;color:var(--pink-dark);margin-bottom:1.5rem"></div>
+      <button class="btn btn-outline" id="btn-pesan-lagi" style="max-width:180px;margin:0 auto">Pesan Lagi</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB ONLINE -->
+<div id="tab-online" class="tab-content">
+  <div class="card">
+    <div class="card-title">👥 Karyawan Sedang Online</div>
+    <div id="online-count-big" style="font-size:28px;font-weight:800;color:var(--pink);margin-bottom:4px">0</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">karyawan aktif sekarang</div>
+    <div id="online-grid" class="online-grid"></div>
+  </div>
+</div>
+
+<!-- TAB RIWAYAT -->
+<div id="tab-riwayat" class="tab-content">
+  <div class="card">
+    <div class="card-title">📋 Riwayat Pesananku</div>
+    <div id="riwayat-list"></div>
+  </div>
+</div>
+
+<!-- TAB PROFIL -->
+<div id="tab-profil" class="tab-content">
+  <div style="text-align:center;margin-bottom:16px">
+    <div class="avatar-wrap" onclick="document.getElementById('foto-profil-input').click()">
+      <div id="avatar-display" class="avatar-default">🍱</div>
+      <div class="avatar-edit-btn">📷</div>
+    </div>
+    <input type="file" id="foto-profil-input" accept="image/*" style="display:none">
+    <div id="profil-nama-display" style="font-size:18px;font-weight:700;color:var(--pink-dark)">—</div>
+    <div id="profil-dept-display" style="font-size:13px;color:var(--text2);margin-top:2px">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">Ketuk foto untuk ganti 📷</div>
+  </div>
+
+  <div class="saldo-card" id="saldo-card-profil">
+    <div style="font-size:12px;opacity:0.85">💰 Saldo Kamu</div>
+    <div class="saldo-amount" id="saldo-display-profil">¥ —</div>
+    <div style="font-size:11px;opacity:0.75">Hubungi admin untuk isi saldo</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">✏️ Edit Profil</div>
+    <div class="form-group"><label>ID Card</label><input type="text" id="profil-id" placeholder="Masukkan ID Card..."></div>
+    <div class="form-group"><label>Nama</label><input type="text" id="profil-nama" readonly placeholder="Otomatis terisi..."></div>
+    <div class="form-group" style="margin-bottom:8px">
+      <label>Departemen</label>
+      <select id="profil-dept">
+        <option value="">-- Pilih Departemen --</option>
+        <option value="SAFETY">SAFETY</option>
+        <option value="SECURITY">SECURITY</option>
+        <option value="LOGISTIK">LOGISTIK</option>
+        <option value="PERBAIKAN">PERBAIKAN</option>
+        <option value="PRODUKSI">PRODUKSI</option>
+        <option value="QUALITY CONTROL">QUALITY CONTROL</option>
+        <option value="IT">IT</option>
+        <option value="ENGINEERING">ENGINEERING</option>
+        <option value="ELEKTRIK">ELEKTRIK</option>
+        <option value="PEMBANGUNAN">PEMBANGUNAN</option>
+        <option value="CIVIL">CIVIL</option>
+        <option value="GA">GA</option>
+        <option value="HR">HR</option>
+        <option value="SCM">SCM</option>
+        <option value="MINERAL PROCESSING 1">MINERAL PROCESSING 1</option>
+        <option value="MINERAL PROCESSING 3">MINERAL PROCESSING 3</option>
+        <option value="ENERGI & PERALATAN">ENERGI & PERALATAN</option>
+        <option value="PEMELIHARAAN 1">PEMELIHARAAN 1</option>
+        <option value="PEMELIHARAAN 2">PEMELIHARAAN 2</option>
+        <option value="HRGA">HRGA</option>
+        <option value="KONTRAKTOR">KONTRAKTOR</option>
+        <option value="LAINNYA">LAINNYA</option>
+      </select>
+    </div>
+    <div id="profil-status" style="margin-bottom:12px"></div>
+    <button class="btn btn-pink" id="btn-simpan-profil">Simpan Profil 💾</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Statistik Saya</div>
+    <div id="profil-stats"></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="active" id="nav-menu-btn"><span class="icon">🍽️</span>Menu</button>
+  <button id="nav-pesan-btn"><span class="icon">📝</span>Pesan</button>
+  <button id="nav-online-btn"><span class="icon">👥</span>Online</button>
+  <button id="nav-riwayat-btn"><span class="icon">📋</span>Riwayat</button>
+  <button id="nav-profil-btn"><span class="icon">👤</span>Profil</button>
+</nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyCzZMMNR2KSvJvsYEDqg311OGaUf-Gp_wU",authDomain:"pesan-makan-kantin-indonesia.firebaseapp.com",databaseURL:"https://pesan-makan-kantin-indonesia-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"pesan-makan-kantin-indonesia",storageBucket:"pesan-makan-kantin-indonesia.firebasestorage.app",messagingSenderId:"451863874688",appId:"1:451863874688:web:b1445e1699324b964eaa65"};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+
+const FONNTE_TOKEN="hmXxNCJjNNZwAuYqUG15";
+const GRUP_ID="120363408415159784@g.us";
+const HARGA={sarapan:7,siang:18,sore:18,malam:12};
+const SALDO_WARNING=30; // kuning kalau < 30 yuan
+
+const defaultMenus={sarapan:["KERUPUK","TELUR BUMBU BALADO","NASI GORENG","BUBUR AYAM","ROTI BAKAR"],siang:["TUMIS BUNCIS","TUMIS KANGKUNG","AYAM GORENG","IKAN BAKAR","SOTO AYAM"],sore:["DANGKOT AYAM","TUMIS WORTEL","MIE GORENG","GADO-GADO","PECEL LELE"],malam:["MIE AYAM","TELUR MAYTA SAPI KECAP","BUBUR KACANG HIJAU","INDOMIE REBUS","NASI UDUK"]};
+const menuLabel={sarapan:'Sarapan',siang:'Makan Siang',sore:'Makan Sore',malam:'Makan Malam'};
+const menuEmoji={sarapan:'🌅',siang:'☀️',sore:'🌆',malam:'🌙'};
+
+let karyawanDB=[], orderIsOpen=false, allPesanan={}, currentMenus={...defaultMenus}, menuFotos={};
+let selectedMenus={sarapan:'',siang:'',sore:'',malam:''};
+let caraMakan='ditempat', lokasiTakeaway=[], onlineUsers={};
+let mySessionKey=null, mySaldo=null;
+
+// DATE
+const hari=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const bln=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const now=new Date();
+document.getElementById('tanggal-header').textContent=hari[now.getDay()]+', '+now.getDate()+' '+bln[now.getMonth()]+' '+now.getFullYear();
+
+// LOAD PROFIL
+const savedProfil=JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+if(savedProfil.id){
+  document.getElementById('profil-id').value=savedProfil.id;
+  document.getElementById('profil-nama').value=savedProfil.nama||'';
+  document.getElementById('profil-dept').value=savedProfil.dept||'';
+  document.getElementById('profil-nama-display').textContent=savedProfil.nama||'—';
+  document.getElementById('profil-dept-display').textContent=savedProfil.dept||'—';
+  document.getElementById('id-card').value=savedProfil.id;
+  document.getElementById('nama-input').value=savedProfil.nama||'';
+  document.getElementById('dept-input').value=savedProfil.dept||'';
+  document.getElementById('status-karyawan').innerHTML='<span class="badge badge-success">✓ Profil Tersimpan</span>';
+  // Register online
+  registerOnline(savedProfil);
+  // Load saldo
+  loadSaldo(savedProfil.id);
+}
+const savedFoto=localStorage.getItem('kantin_foto_profil');
+if(savedFoto) setAvatarImg(savedFoto);
+
+// PERALATAN MAKAN
+let peralatan = {sendok: false, sarung: false};
+
+function togglePeralatan(jenis) {
+  peralatan[jenis] = !peralatan[jenis];
+  const btn = document.getElementById('btn-' + jenis);
+  if(peralatan[jenis]) {
+    btn.style.cssText = 'border:2px solid var(--pink);background:var(--pink-light);color:var(--pink-dark);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+  } else {
+    btn.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+  }
+}
+
+// PERLENGKAPAN MAKAN
+let perlengkapan = {sendok: false, sarung: false};
+
+function togglePerlengkapan(type) {
+  perlengkapan[type] = !perlengkapan[type];
+  const btn = document.getElementById('btn-'+type);
+  const label = type === 'sendok' ? 'Sendok Plastik' : 'Sarung Tangan';
+  const emoji = type === 'sendok' ? '🥄' : '🧤';
+  if(perlengkapan[type]) {
+    btn.style.cssText = 'border:2px solid var(--pink);background:var(--pink-light);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+    btn.innerHTML = `<div style="font-size:28px">${emoji}</div><div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--pink-dark)">${label}</div><div style="font-size:10px;color:var(--pink);margin-top:2px;font-weight:600">✅ Dipilih</div>`;
+  } else {
+    btn.style.cssText = 'border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+    btn.innerHTML = `<div style="font-size:28px">${emoji}</div><div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">${label}</div><div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>`;
+  }
+}
+
+// SALDO
+function loadSaldo(id){
+  db.ref('saldo/'+id).on('value',s=>{
+    mySaldo=s.val()!==null?s.val():null;
+    updateSaldoUI();
+  });
+}
+
+function updateSaldoUI(){
+  const txt=mySaldo!==null?'¥'+mySaldo.toFixed(0):'¥ —';
+  const isLow=mySaldo!==null&&mySaldo<SALDO_WARNING;
+  document.getElementById('saldo-chip').textContent=txt;
+  document.getElementById('saldo-chip').className='saldo-chip'+(isLow?' low':'');
+  document.getElementById('saldo-display-pesan').textContent=txt;
+  document.getElementById('saldo-display-profil').textContent=txt;
+  const sc=document.getElementById('saldo-card-profil');
+  sc.className='saldo-card'+(isLow?' low':'');
+  hitungTotalHarga();
+}
+
+function hitungTotalHarga(){
+  let total=0;
+  Object.entries(selectedMenus).forEach(([cat,nama])=>{if(nama) total+=HARGA[cat]||0;});
+  document.getElementById('total-harga').textContent='Total: ¥'+total;
+  const saldoAfter=mySaldo!==null?mySaldo-total:null;
+  document.getElementById('saldo-after').textContent=saldoAfter!==null?'Setelah pesan: ¥'+saldoAfter.toFixed(0):'Setelah pesan: ¥ —';
+  if(saldoAfter!==null&&saldoAfter<0){
+    document.getElementById('saldo-after').style.color='#ffcc00';
+  } else {
+    document.getElementById('saldo-after').style.color='rgba(255,255,255,0.75)';
+  }
+}
+
+// ONLINE PRESENCE
+function registerOnline(profil){
+  const sessionRef=db.ref('online/'+profil.id);
+  sessionRef.set({id:profil.id,nama:profil.nama,dept:profil.dept,foto:localStorage.getItem('kantin_foto_profil')||null,ts:firebase.database.ServerValue.TIMESTAMP});
+  mySessionKey=profil.id;
+  sessionRef.onDisconnect().remove();
+  // Refresh every 30s
+  setInterval(()=>{sessionRef.update({ts:firebase.database.ServerValue.TIMESTAMP});},30000);
+}
+
+db.ref('online').on('value',s=>{
+  onlineUsers=s.val()||{};
+  renderOnline();
+});
+
+function renderOnline(){
+  const list=Object.values(onlineUsers);
+  document.getElementById('online-count').textContent=list.length+' karyawan online';
+  document.getElementById('online-count-big').textContent=list.length;
+  document.getElementById('online-grid').innerHTML=list.map(u=>{
+    const foto=u.foto?`<img src="${u.foto}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--pink)">`:
+      `<div class="online-card-avatar">${(u.nama||'?').charAt(0)}</div>`;
+    return `<div class="online-card">${foto}<div class="online-card-name">${(u.nama||'').split(' ')[0]}</div></div>`;
+  }).join('')||'<div style="grid-column:1/-1;text-align:center;color:var(--text2);padding:1rem;font-size:13px">Belum ada yang online</div>';
+}
+
+// FIREBASE LISTENERS
+db.ref('karyawan').on('value',s=>{if(s.val())karyawanDB=Object.values(s.val());});
+db.ref('settings/orderOpen').on('value',s=>{
+  orderIsOpen=s.val()||false;
+  const bar=document.getElementById('order-bar');
+  if(orderIsOpen){bar.className='order-bar open';bar.textContent='🟢 Order Dibuka — Silakan Pesan!';}
+  else{bar.className='order-bar closed';bar.textContent='🔒 Order Sedang Ditutup';}
+  document.getElementById('closed-notice').style.display=orderIsOpen?'none':'block';
+  document.getElementById('form-pesan').style.display=orderIsOpen?'block':'none';
+});
+db.ref('menus').on('value',s=>{currentMenus=s.val()||{...defaultMenus};renderMenuDisplay();renderMenuForm();});
+db.ref('pesanan').on('value',s=>{allPesanan=s.val()||{};renderRiwayat();renderProfilStats();});
+db.ref('menuFotos').on('value',s=>{menuFotos=s.val()||{};renderMenuDisplay();renderMenuForm();});
+db.ref('settings/lokasiTakeaway').on('value',s=>{
+  lokasiTakeaway=s.val()||[];
+  renderLokasiSelect();
+});
+
+function menuKey(nama){return btoa(unescape(encodeURIComponent(nama))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');}
+
+// RENDER MENU TAB
+function renderMenuDisplay(){
+  const html=Object.entries(menuLabel).map(([cat,label])=>{
+    const items=currentMenus[cat]||[];
+    if(!items.length)return '';
+    return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
+    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];return`<div class="menu-item"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><div class="menu-item-price">¥${HARGA[cat]}</div></div></div>`;}).join('')}</div>`;
+  }).join('');
+  document.getElementById('menu-display').innerHTML=html||'<div class="empty"><div class="empty-icon">🍽️</div>Belum ada menu</div>';
+}
+
+function renderMenuForm(){
+  const html=Object.entries(menuLabel).map(([cat,label])=>{
+    const items=currentMenus[cat]||[];
+    if(!items.length)return '';
+    return `<div class="waktu-label">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
+    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];const sel=selectedMenus[cat]===m;return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
+  }).join('');
+  document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
+}
+
+function pilihMenu(cat,nama,el){
+  selectedMenus[cat]=selectedMenus[cat]===nama?'':nama;
+  el.closest('.menu-grid').querySelectorAll('.menu-item').forEach(c=>c.classList.remove('selected'));
+  if(selectedMenus[cat])el.classList.add('selected');
+  hitungTotalHarga();
+}
+
+// TAKE AWAY
+function setCaraMakan(mode){
+  caraMakan=mode;
+  document.getElementById('btn-ditempat').className='toggle-btn'+(mode==='ditempat'?' active':'');
+  document.getElementById('btn-takeaway').className='toggle-btn'+(mode==='takeaway'?' active':'');
+  document.getElementById('takeaway-section').style.display=mode==='takeaway'?'block':'none';
+}
+
+function renderLokasiSelect(){
+  const sel=document.getElementById('lokasi-select');
+  sel.innerHTML='<option value="">-- Pilih Lokasi --</option>';
+  lokasiTakeaway.forEach(l=>{
+    const opt=document.createElement('option');
+    opt.value=l.nama;
+    opt.dataset.bolehtakeaway=l.bolehTakeaway?'1':'0';
+    opt.textContent=l.nama+(l.bolehTakeaway?' ✅':' ❌ (Harus makan di tempat)');
+    sel.appendChild(opt);
+  });
+}
+
+document.getElementById('lokasi-select').addEventListener('change',function(){
+  const opt=this.options[this.selectedIndex];
+  const status=document.getElementById('takeaway-status');
+  if(!opt.value){status.innerHTML='';return;}
+  if(opt.dataset.bolehtakeaway==='1'){
+    status.innerHTML='<div class="alert alert-success">✅ Lokasi ini diizinkan Take Away</div>';
+  } else {
+    status.innerHTML='<div class="alert alert-danger">❌ Lokasi ini harus makan di tempat (kantin terlalu dekat)</div>';
+  }
+});
+
+// ID CARD INPUT
+document.getElementById('id-card').addEventListener('input',function(){
+  const val=this.value.trim();
+  const k=karyawanDB.find(k=>String(k.id)===val);
+  const st=document.getElementById('status-karyawan');
+  if(k){document.getElementById('nama-input').value=k.nama;document.getElementById('dept-input').value=k.dept;st.innerHTML='<span class="badge badge-success">✓ Karyawan Terdaftar</span>';loadSaldo(val);}
+  else if(val.length>=5){document.getElementById('nama-input').value='';document.getElementById('dept-input').value='';st.innerHTML='<span class="badge badge-danger">✗ ID Tidak Ditemukan</span>';}
+  else{document.getElementById('nama-input').value='';document.getElementById('dept-input').value='';st.innerHTML='';}
+});
+
+// PROFIL INPUT
+document.getElementById('profil-id').addEventListener('input',function(){
+  const val=this.value.trim();
+  const k=karyawanDB.find(k=>String(k.id)===val);
+  const st=document.getElementById('profil-status');
+  if(k){document.getElementById('profil-nama').value=k.nama;document.getElementById('profil-dept').value=k.dept;st.innerHTML='<span class="badge badge-success">✓ Karyawan Ditemukan</span>';}
+  else if(val.length>=5){document.getElementById('profil-nama').value='';st.innerHTML='<span class="badge badge-danger">✗ ID Tidak Ditemukan</span>';}
+  else st.innerHTML='';
+});
+
+// SIMPAN PROFIL
+document.getElementById('btn-simpan-profil').addEventListener('click',()=>{
+  const id=document.getElementById('profil-id').value.trim();
+  const nama=document.getElementById('profil-nama').value;
+  const dept=document.getElementById('profil-dept').value;
+  if(!id||!nama){showAlertGlobal('Isi ID Card yang valid dulu!','danger');return;}
+  if(!dept){showAlertGlobal('Pilih departemen dulu!','danger');return;}
+  const profil={id,nama,dept};
+  localStorage.setItem('kantin_profil',JSON.stringify(profil));
+  document.getElementById('profil-nama-display').textContent=nama;
+  document.getElementById('profil-dept-display').textContent=dept;
+  document.getElementById('id-card').value=id;
+  document.getElementById('nama-input').value=nama;
+  document.getElementById('dept-input').value=dept;
+  document.getElementById('status-karyawan').innerHTML='<span class="badge badge-success">✓ Profil Tersimpan</span>';
+  registerOnline(profil);
+  loadSaldo(id);
+  showAlertGlobal('Profil berhasil disimpan! 🌸','success');
+});
+
+// FOTO PROFIL
+document.getElementById('foto-profil-input').addEventListener('change',function(){
+  const file=this.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');canvas.width=200;canvas.height=200;
+      const ctx=canvas.getContext('2d');
+      const size=Math.min(img.width,img.height);
+      ctx.drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,200,200);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      localStorage.setItem('kantin_foto_profil',compressed);
+      setAvatarImg(compressed);
+      // Update online presence with new foto
+      const p=JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+      if(p.id) db.ref('online/'+p.id).update({foto:compressed});
+      showAlertGlobal('Foto profil berhasil disimpan! 🌸','success');
+    };img.src=e.target.result;
+  };reader.readAsDataURL(file);this.value='';
+});
+
+function setAvatarImg(src){
+  const wrap=document.getElementById('avatar-display');
+  wrap.insertAdjacentHTML('afterend',`<img id="avatar-display" class="avatar-img" src="${src}" alt="Foto">`);
+  wrap.remove();
+}
+
+// SUBMIT PESANAN
+document.getElementById('btn-submit').addEventListener('click',async()=>{
+  const id=document.getElementById('id-card').value.trim();
+  const nama=document.getElementById('nama-input').value;
+  const dept=document.getElementById('dept-input').value;
+  if(!id||!nama){showAlertForm('Masukkan ID Card yang valid!','danger');return;}
+  const ms=selectedMenus.sarapan,msi=selectedMenus.siang,mso=selectedMenus.sore,mm=selectedMenus.malam;
+  if(!ms&&!msi&&!mso&&!mm){showAlertForm('Pilih minimal satu menu!','danger');return;}
+
+  // Cek take away
+  if(caraMakan==='takeaway'){
+    const sel=document.getElementById('lokasi-select');
+    const opt=sel.options[sel.selectedIndex];
+    if(!opt||!opt.value){showAlertForm('Pilih lokasi kamu dulu!','danger');return;}
+    if(opt.dataset.bolehtakeaway!=='1'){showAlertForm('Lokasi kamu tidak diizinkan Take Away. Silakan makan di tempat!','danger');return;}
+  }
+
+  // Cek saldo
+  let total=0;
+  if(ms)total+=HARGA.sarapan;if(msi)total+=HARGA.siang;if(mso)total+=HARGA.sore;if(mm)total+=HARGA.malam;
+  if(mySaldo!==null&&mySaldo<total){showAlertForm(`Saldo tidak cukup! Saldo kamu ¥${mySaldo}, perlu ¥${total}`,'danger');return;}
+
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true;btn.textContent='Mengirim... 🌸';
+  try{
+    const today=new Date().toISOString().split('T')[0];
+    const snap=await db.ref('pesanan').once('value');
+    if(snap.val()){
+      const sudah=Object.values(snap.val()).some(p=>p.id===id&&p.tanggal===today);
+      if(sudah){showAlertForm('Kamu sudah memesan hari ini!','danger');btn.disabled=false;btn.textContent='Kirim Pesanan 🌸';return;}
+    }
+    const lokasi=caraMakan==='takeaway'?document.getElementById('lokasi-select').value:'Kantin';
+    const pesananBaru={id,nama,dept,caraMakan:caraMakan,lokasi:lokasiDipilih?lokasiDipilih.nama:null,sendok:perlengkapan.sendok,sarungTangan:perlengkapan.sarung,sendok:peralatan.sendok,sarungTangan:peralatan.sarung,sarapan:ms||null,siang:msi||null,sore:mso||null,malam:mm||null,
+      caraMakan,lokasi,
+      sendok:document.getElementById('pakai-sendok').checked,
+      sarungTangan:document.getElementById('pakai-sarung').checked,
+      totalHarga:total,
+      saran:document.getElementById('saran').value||null,
+      keluhan:document.getElementById('keluhan').value||null,
+      tanggal:today,timestamp:new Date().toISOString()};
+    await db.ref('pesanan').push(pesananBaru);
+    // Potong saldo
+    if(totalHarga > 0) {
+      const profil = JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+      if(profil.id) {
+        const newSaldo = Math.max(0, mySaldo - totalHarga);
+        await db.ref('saldo/'+profil.id).set(newSaldo);
+      }
+    }
+    // Potong saldo
+    if(mySaldo!==null){
+      const newSaldo=mySaldo-total;
+      await db.ref('saldo/'+id).set(newSaldo);
+      document.getElementById('sukses-saldo').textContent=`Saldo terpotong ¥${total} → Sisa ¥${newSaldo}`;
+    }
+    await kirimNotifWA(pesananBaru);
+    document.getElementById('form-pesan').style.display='none';
+    document.getElementById('sukses-pesan').style.display='block';
+  }catch(e){
+    showAlertForm('Gagal mengirim. Coba lagi!','danger');
+    btn.disabled=false;btn.textContent='Kirim Pesanan 🌸';
+  }
+});
+
+document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
+  document.getElementById('sukses-pesan').style.display='none';
+  document.getElementById('form-pesan').style.display='block';
+  selectedMenus={sarapan:'',siang:'',sore:'',malam:''};
+  perlengkapan={sendok:false,sarung:false};
+  ['sendok','sarung'].forEach(t=>{
+    const btn=document.getElementById('btn-'+t);
+    const label=t==='sendok'?'Sendok Plastik':'Sarung Tangan';
+    const emoji=t==='sendok'?'🥄':'🧤';
+    btn.style.cssText='border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+    btn.innerHTML=`<div style="font-size:28px">${emoji}</div><div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">${label}</div><div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>`;
+  });
+  renderMenuForm();hitungTotalHarga();
+  document.getElementById('saran').value='';document.getElementById('keluhan').value='';
+  document.getElementById('pakai-sendok').checked=false;document.getElementById('pakai-sarung').checked=false;
+  setCaraMakan('ditempat');
+  peralatan = {sendok: false, sarung: false};
+  ['sendok','sarung'].forEach(j => {
+    const b = document.getElementById('btn-'+j);
+    if(b) b.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
+  });
+  document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Kirim Pesanan 🌸';
+});
+
+// SALDO
+const HARGA = {sarapan: 7, siang: 18, sore: 18, malam: 12};
+let mySaldo = 0;
+
+db.ref('saldo').on('value', s => {
+  const profil = JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+  if(!profil.id) return;
+  const allSaldo = s.val()||{};
+  mySaldo = allSaldo[profil.id]||0;
+  const isLow = mySaldo <= 30;
+  const el = document.getElementById('saldo-display');
+  const angka = document.getElementById('saldo-angka');
+  if(el) {
+    el.style.display = 'block';
+    el.style.background = isLow ? 'rgba(255,0,0,0.3)' : 'rgba(255,255,255,0.2)';
+  }
+  if(angka) {
+    angka.textContent = '¥' + mySaldo;
+    angka.style.color = isLow ? '#ffcccc' : '#fff';
+  }
+});
+
+function hitungTotalHarga() {
+  let total = 0;
+  if(selectedMenus.sarapan) total += HARGA.sarapan;
+  if(selectedMenus.siang) total += HARGA.siang;
+  if(selectedMenus.sore) total += HARGA.sore;
+  if(selectedMenus.malam) total += HARGA.malam;
+  return total;
+}
+
+// CARA MAKAN & LOKASI
+let caraMakan = 'ditempat';
+let lokasiData = [];
+let lokasiDipilih = null;
+
+db.ref('settings/lokasiTakeaway').on('value', s => {
+  lokasiData = s.val() || [];
+  const sel = document.getElementById('lokasi-select');
+  sel.innerHTML = '<option value="">-- Pilih Lokasi --</option>';
+  lokasiData.forEach((l, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = l.nama + (l.bolehTakeaway ? ' ✅' : ' ❌');
+    sel.appendChild(opt);
+  });
+});
+
+document.getElementById('lokasi-select').addEventListener('change', function() {
+  const idx = parseInt(this.value);
+  if(isNaN(idx)) { lokasiDipilih = null; document.getElementById('takeaway-status').textContent=''; return; }
+  lokasiDipilih = lokasiData[idx];
+  const st = document.getElementById('takeaway-status');
+  if(lokasiDipilih.bolehTakeaway) {
+    st.innerHTML = '<span style="color:#2e7d32">✅ Take Away diizinkan untuk lokasi ini</span>';
+  } else {
+    st.innerHTML = '<span style="color:#c62828">❌ Lokasi ini tidak diizinkan Take Away. Silakan makan di kantin.</span>';
+  }
+});
+
+function pilihCaraMakan(mode) {
+  caraMakan = mode;
+  const btnDitempat = document.getElementById('btn-ditempat');
+  const btnTakeaway = document.getElementById('btn-takeaway');
+  const lokasiSection = document.getElementById('lokasi-section');
+  if(mode === 'ditempat') {
+    btnDitempat.style.cssText = 'border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
+    btnTakeaway.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
+    lokasiSection.style.display = 'none';
+    lokasiDipilih = null;
+  } else {
+    btnTakeaway.style.cssText = 'border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
+    btnDitempat.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
+    lokasiSection.style.display = 'block';
+  }
+}
+
+async function kirimNotifWA(p){
+  try{
+    const msg=`🌸 *PESANAN MASUK — KANTIN EIEB*\n\n👤 *${p.nama}*\n🪪 ID: ${p.id} | ${p.dept}\n🕐 ${new Date().toLocaleTimeString('id-ID')}\n${p.caraMakan==='takeaway'?'🥡 TAKE AWAY - Lokasi: '+p.lokasi:'🍽️ Makan di Tempat'}\n\n📋 *Menu:*\n`+
+      (p.sarapan?`🌅 Sarapan: ${p.sarapan} (¥${HARGA.sarapan})\n`:'')+
+      (p.siang?`☀️ Siang: ${p.siang} (¥${HARGA.siang})\n`:'')+
+      (p.sore?`🌆 Sore: ${p.sore} (¥${HARGA.sore})\n`:'')+
+      (p.malam?`🌙 Malam: ${p.malam} (¥${HARGA.malam})\n`:'')+
+      `💰 Total: ¥${p.totalHarga}\n`+
+      (p.sendok?'🥄 Butuh sendok\n':'')+(p.sarungTangan?'🧤 Butuh sarung tangan\n':'')+
+      (p.saran?`\n💬 Saran: ${p.saran}`:'')+
+      (p.keluhan?`\n⚠️ Keluhan: ${p.keluhan}`:'');
+    await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':FONNTE_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({target:GRUP_ID,message:msg})});
+  }catch(e){}
+}
+
+function renderRiwayat(){
+  const profil=JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+  if(!profil.id){document.getElementById('riwayat-list').innerHTML='<div class="empty"><div class="empty-icon">👤</div>Simpan profil dulu ya!</div>';return;}
+  const myOrders=Object.values(allPesanan).filter(p=>p.id===profil.id).sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  if(!myOrders.length){document.getElementById('riwayat-list').innerHTML='<div class="empty"><div class="empty-icon">📋</div>Belum ada riwayat</div>';return;}
+  document.getElementById('riwayat-list').innerHTML=myOrders.map(p=>`
+    <div class="pesanan-item">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700">${p.tanggal}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--pink)">¥${p.totalHarga||0}</div>
+      </div>
+      <div style="font-size:11px;color:var(--text2)">${new Date(p.timestamp).toLocaleTimeString('id-ID')} · ${p.caraMakan==='takeaway'?'🥡 Take Away':'🍽️ Di Tempat'}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">
+        ${p.sarapan?`<span class="badge badge-pink">🌅 ${p.sarapan}</span>`:''}
+        ${p.siang?`<span class="badge badge-info">☀️ ${p.siang}</span>`:''}
+        ${p.sore?`<span class="badge badge-warning">🌆 ${p.sore}</span>`:''}
+        ${p.malam?`<span class="badge badge-pink">🌙 ${p.malam}</span>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderProfilStats(){
+  const profil=JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+  if(!profil.id){document.getElementById('profil-stats').innerHTML='<div class="empty" style="padding:1rem">Simpan profil dulu</div>';return;}
+  const myOrders=Object.values(allPesanan).filter(p=>p.id===profil.id);
+  const today=new Date().toISOString().split('T')[0];
+  const todayOrder=myOrders.find(p=>p.tanggal===today);
+  const totalSpend=myOrders.reduce((a,p)=>a+(p.totalHarga||0),0);
+  document.getElementById('profil-stats').innerHTML=`
+    <div class="profile-info"><span>Total Pesanan</span><span>${myOrders.length}x</span></div>
+    <div class="profile-info"><span>Total Pengeluaran</span><span>¥${totalSpend}</span></div>
+    <div class="profile-info"><span>Pesanan Hari Ini</span><span>${todayOrder?'✅ Sudah':'❌ Belum'}</span></div>
+    <div class="profile-info"><span>ID Card</span><span>${profil.id}</span></div>
+    <div class="profile-info"><span>Departemen</span><span>${profil.dept||'—'}</span></div>`;
+}
+
+function showAlertGlobal(msg,type='success'){
+  const el=document.getElementById('alert-global');
+  el.innerHTML=`<div class="alert alert-${type}" style="margin:8px 0">${msg}</div>`;
+  setTimeout(()=>el.innerHTML='',3500);
+}
+function showAlertForm(msg,type='success'){
+  const el=document.getElementById('alert-form');
+  el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(()=>el.innerHTML='',3500);
+}
+
+// BOTTOM NAV
+[['menu','nav-menu-btn'],['pesan','nav-pesan-btn'],['online','nav-online-btn'],['riwayat','nav-riwayat-btn'],['profil','nav-profil-btn']].forEach(([tab,btnId])=>{
+  document.getElementById(btnId).addEventListener('click',function(){
+    document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.bottom-nav button').forEach(el=>el.classList.remove('active'));
+    document.getElementById('tab-'+tab).classList.add('active');
+    this.classList.add('active');
+    if(tab==='riwayat')renderRiwayat();
+    if(tab==='profil')renderProfilStats();
+  });
+});
+
+// PWA
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});
+function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.then(()=>{deferredPrompt=null;document.getElementById('install-banner').style.display='none';});}}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>

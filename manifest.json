@@ -1,0 +1,24 @@
+{
+  "name": "KANTIN EIEB",
+  "short_name": "KANTIN EIEB",
+  "description": "Sistem Pemesanan Makan Karyawan",
+  "start_url": "/karyawan.html",
+  "display": "standalone",
+  "background_color": "#fff0f5",
+  "theme_color": "#e91e8c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
