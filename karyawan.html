@@ -506,7 +506,7 @@ function renderOnline(){
 // FIREBASE LISTENERS
 db.ref('karyawan').on('value',s=>{if(s.val())karyawanDB=Object.values(s.val());});
 db.ref('settings/orderOpen').on('value',s=>{
-  orderIsOpen=s.val()||false;
+  orderIsOpen=s.val()===true||s.val()==='true';
   const bar=document.getElementById('order-bar');
   if(orderIsOpen){bar.className='order-bar open';bar.textContent='🟢 Order Dibuka — Silakan Pesan!';}
   else{bar.className='order-bar closed';bar.textContent='🔒 Order Sedang Ditutup';}
@@ -736,86 +736,7 @@ document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
     if(b) b.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
   });
   document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Kirim Pesanan 🌸';
-});
-
-// SALDO
-const HARGA = {sarapan: 7, siang: 18, sore: 18, malam: 12};
-let mySaldo = 0;
-
-db.ref('saldo').on('value', s => {
-  const profil = JSON.parse(localStorage.getItem('kantin_profil')||'{}');
-  if(!profil.id) return;
-  const allSaldo = s.val()||{};
-  mySaldo = allSaldo[profil.id]||0;
-  const isLow = mySaldo <= 30;
-  const el = document.getElementById('saldo-display');
-  const angka = document.getElementById('saldo-angka');
-  if(el) {
-    el.style.display = 'block';
-    el.style.background = isLow ? 'rgba(255,0,0,0.3)' : 'rgba(255,255,255,0.2)';
-  }
-  if(angka) {
-    angka.textContent = '¥' + mySaldo;
-    angka.style.color = isLow ? '#ffcccc' : '#fff';
-  }
-});
-
-function hitungTotalHarga() {
-  let total = 0;
-  if(selectedMenus.sarapan) total += HARGA.sarapan;
-  if(selectedMenus.siang) total += HARGA.siang;
-  if(selectedMenus.sore) total += HARGA.sore;
-  if(selectedMenus.malam) total += HARGA.malam;
-  return total;
-}
-
-// CARA MAKAN & LOKASI
-let caraMakan = 'ditempat';
-let lokasiData = [];
-let lokasiDipilih = null;
-
-db.ref('settings/lokasiTakeaway').on('value', s => {
-  lokasiData = s.val() || [];
-  const sel = document.getElementById('lokasi-select');
-  sel.innerHTML = '<option value="">-- Pilih Lokasi --</option>';
-  lokasiData.forEach((l, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = l.nama + (l.bolehTakeaway ? ' ✅' : ' ❌');
-    sel.appendChild(opt);
-  });
-});
-
-document.getElementById('lokasi-select').addEventListener('change', function() {
-  const idx = parseInt(this.value);
-  if(isNaN(idx)) { lokasiDipilih = null; document.getElementById('takeaway-status').textContent=''; return; }
-  lokasiDipilih = lokasiData[idx];
-  const st = document.getElementById('takeaway-status');
-  if(lokasiDipilih.bolehTakeaway) {
-    st.innerHTML = '<span style="color:#2e7d32">✅ Take Away diizinkan untuk lokasi ini</span>';
-  } else {
-    st.innerHTML = '<span style="color:#c62828">❌ Lokasi ini tidak diizinkan Take Away. Silakan makan di kantin.</span>';
-  }
-});
-
-function pilihCaraMakan(mode) {
-  caraMakan = mode;
-  const btnDitempat = document.getElementById('btn-ditempat');
-  const btnTakeaway = document.getElementById('btn-takeaway');
-  const lokasiSection = document.getElementById('lokasi-section');
-  if(mode === 'ditempat') {
-    btnDitempat.style.cssText = 'border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
-    btnTakeaway.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
-    lokasiSection.style.display = 'none';
-    lokasiDipilih = null;
-  } else {
-    btnTakeaway.style.cssText = 'border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
-    btnDitempat.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s';
-    lokasiSection.style.display = 'block';
-  }
-}
-
-async function kirimNotifWA(p){
+});async function kirimNotifWA(p){
   try{
     const msg=`🌸 *PESANAN MASUK — KANTIN EIEB*\n\n👤 *${p.nama}*\n🪪 ID: ${p.id} | ${p.dept}\n🕐 ${new Date().toLocaleTimeString('id-ID')}\n${p.caraMakan==='takeaway'?'🥡 TAKE AWAY - Lokasi: '+p.lokasi:'🍽️ Makan di Tempat'}\n\n📋 *Menu:*\n`+
       (p.sarapan?`🌅 Sarapan: ${p.sarapan} (¥${HARGA.sarapan})\n`:'')+
