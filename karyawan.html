@@ -98,6 +98,7 @@ textarea{resize:none}
   <div class="header-top">
     <div>
       <h1>🍱 KANTIN EIEB</h1>
+      <p style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:1px">系统 by Ilang 亿朗</p>
       <p id="tanggal-header"></p>
     </div>
     <div id="saldo-chip" class="saldo-chip">¥ —</div>
@@ -173,6 +174,8 @@ textarea{resize:none}
     </div>
 
     <!-- TAKE AWAY / MAKAN DI TEMPAT -->
+    <div class="card">
+      <div class="card-title">🥡 Cara Makan</div>
       <div class="toggle-group">
         <button class="toggle-btn active" id="btn-ditempat" onclick="setCaraMakan('ditempat')">🍽️ Makan di Tempat</button>
         <button class="toggle-btn" id="btn-takeaway" onclick="setCaraMakan('takeaway')">🥡 Take Away</button>
@@ -203,26 +206,8 @@ textarea{resize:none}
         </label>
       </div>
     </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div id="btn-ditempat" onclick="pilihCaraMakan('ditempat')" style="border:2px solid var(--pink);background:var(--pink);color:#fff;border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s">
-          <div style="font-size:24px">🍽️</div>
-          <div style="font-size:13px;font-weight:700;margin-top:4px">Makan di Tempat</div>
-        </div>
-        <div id="btn-takeaway" onclick="pilihCaraMakan('takeaway')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s">
-          <div style="font-size:24px">🥡</div>
-          <div style="font-size:13px;font-weight:700;margin-top:4px">Take Away</div>
-        </div>
-      </div>
-      <div id="lokasi-section" style="display:none">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Pilih Lokasi Kamu</div>
-        <select id="lokasi-select">
-          <option value="">-- Pilih Lokasi --</option>
-        </select>
-        <div id="takeaway-status" style="margin-top:8px;font-size:13px;font-weight:600"></div>
-      </div>
-    </div>
 
-    <div class="card">
+        <div class="card">
       <div class="card-title">🥄 Perlengkapan Makan</div>
       <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Opsional — pilih jika butuh. Demi lingkungan, kurangi plastik ya! 🌿</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
@@ -296,11 +281,11 @@ textarea{resize:none}
 <!-- TAB PROFIL -->
 <div id="tab-profil" class="tab-content">
   <div style="text-align:center;margin-bottom:16px">
-    <div class="avatar-wrap" onclick="document.getElementById('foto-profil-input').click()">
+    <div class="avatar-wrap" >
       <div id="avatar-display" class="avatar-default">🍱</div>
       <div class="avatar-edit-btn">📷</div>
     </div>
-    <input type="file" id="foto-profil-input" accept="image/*" style="display:none">
+    <input type="file" id="foto-profil-input" accept="image/*" style="display:none" disabled>
     <div id="profil-nama-display" style="font-size:18px;font-weight:700;color:var(--pink-dark)">—</div>
     <div id="profil-dept-display" style="font-size:13px;color:var(--text2);margin-top:2px">—</div>
     <div style="font-size:11px;color:var(--text2);margin-top:4px">Ketuk foto untuk ganti 📷</div>
