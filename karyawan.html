@@ -597,11 +597,14 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
     if(!opt||!opt.value){showAlertForm('Pilih lokasi kamu dulu!','danger');return;}
     if(opt.dataset.bolehtakeaway!=='1'){showAlertForm('Lokasi kamu tidak diizinkan Take Away. Silakan makan di tempat!','danger');return;}
   }
-
-  // Cek saldo
-  let total=0;
-  if(ms)total+=HARGA.sarapan;if(msi)total+=HARGA.siang;if(mso)total+=HARGA.sore;if(mm)total+=HARGA.malam;
-  if(mySaldo!==null&&mySaldo<total){showAlertForm(`Saldo tidak cukup! Saldo kamu ¥${mySaldo}, perlu ¥${total}`,'danger');return;}
+  
+// Cek saldo (hanya untuk Take Away)
+  if(caraMakan === 'takeaway') {
+    let total=0;
+    if(ms)total+=HARGA.sarapan;if(msi)total+=HARGA.siang;if(mso)total+=HARGA.sore;if(mm)total+=HARGA.malam;
+    if(mySaldo<=0){showAlertForm('Saldo kamu habis! Hubungi admin untuk isi saldo.','danger');return;}
+    if(mySaldo<total){showAlertForm(`Saldo tidak cukup! Saldo kamu ¥${mySaldo}, perlu ¥${total}`,'danger');return;}
+  }
 
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;btn.textContent='Mengirim... 🌸';
