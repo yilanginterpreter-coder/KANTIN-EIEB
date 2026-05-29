@@ -191,10 +191,59 @@ textarea{resize:none}
       </div>
     </div>
 
+    <!-- SENDOK / SARUNG TANGAN -->
+    <div class="card">
+      <div class="card-title">♻️ Alat Makan (Opsional)</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Hemat plastik = jaga lingkungan 🌿</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
+          <input type="checkbox" id="pakai-sendok" style="width:18px;height:18px;accent-color:var(--pink)">
+          <div><div style="font-size:13px;font-weight:600">🥄 Pakai Sendok Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sendok plastik</div></div>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
+          <input type="checkbox" id="pakai-sarung" style="width:18px;height:18px;accent-color:var(--pink)">
+          <div><div style="font-size:13px;font-weight:600">🧤 Pakai Sarung Tangan Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sarung tangan</div></div>
+        </label>
+      </div>
+    </div>
+
+        <div class="card">
+      <div class="card-title">🥄 Perlengkapan Makan</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Opsional — pilih jika butuh. Demi lingkungan, kurangi plastik ya! 🌿</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="btn-sendok" onclick="togglePerlengkapan('sendok')" style="border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:28px">🥄</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">Sendok Plastik</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>
+        </div>
+        <div id="btn-sarung" onclick="togglePerlengkapan('sarung')" style="border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:28px">🧤</div>
+          <div style="font-size:12px;font-weight:700;margin-top:6px;color:var(--text)">Sarung Tangan</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Tidak dipilih</div>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">💬 Saran & Keluhan</div>
       <div class="form-group"><label>Saran (opsional)</label><input type="text" id="saran" placeholder="Saran untuk menu..."></div>
       <div class="form-group" style="margin-bottom:0"><label>Keluhan (opsional)</label><textarea id="keluhan" rows="2" placeholder="Keluhan tentang makanan..."></textarea></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🥄 Peralatan Makan (Opsional)</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Pilih jika butuh — skip kalau tidak perlu, bantu kurangi sampah plastik 🌿</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div id="btn-sendok" onclick="togglePeralatan('sendok')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🥄</div>
+          <div style="font-size:13px;font-weight:600;margin-top:4px">Sendok</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Plastik sekali pakai</div>
+        </div>
+        <div id="btn-sarung" onclick="togglePeralatan('sarung')" style="border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:24px">🧤</div>
+          <div style="font-size:13px;font-weight:600;margin-top:4px">Sarung Tangan</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">Plastik sekali pakai</div>
+        </div>
+      </div>
     </div>
 
     <button class="btn btn-pink" id="btn-submit">Kirim Pesanan 🌸</button>
@@ -204,7 +253,7 @@ textarea{resize:none}
     <div class="card" style="text-align:center;padding:2.5rem 1rem">
       <div style="font-size:56px;margin-bottom:12px">✅</div>
       <div style="font-size:18px;font-weight:700;margin-bottom:6px">Pesanan Terkirim!</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">Pesanan kamu sudah diterima oleh Ilang! Besok jangan lupa order lagi ya 🌸</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">Pesananmu sudah diterima. Terima kasih! 🌸</div>
       <div id="sukses-saldo" style="font-size:14px;font-weight:700;color:var(--pink-dark);margin-bottom:1.5rem"></div>
       <button class="btn btn-outline" id="btn-pesan-lagi" style="max-width:180px;margin:0 auto">Pesan Lagi</button>
     </div>
@@ -597,14 +646,11 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
     if(!opt||!opt.value){showAlertForm('Pilih lokasi kamu dulu!','danger');return;}
     if(opt.dataset.bolehtakeaway!=='1'){showAlertForm('Lokasi kamu tidak diizinkan Take Away. Silakan makan di tempat!','danger');return;}
   }
-  
-// Cek saldo (hanya untuk Take Away)
-  if(caraMakan === 'takeaway') {
-    let total=0;
-    if(ms)total+=HARGA.sarapan;if(msi)total+=HARGA.siang;if(mso)total+=HARGA.sore;if(mm)total+=HARGA.malam;
-    if(mySaldo<=0){showAlertForm('Saldo kamu habis! Hubungi admin untuk isi saldo.','danger');return;}
-    if(mySaldo<total){showAlertForm(`Saldo tidak cukup! Saldo kamu ¥${mySaldo}, perlu ¥${total}`,'danger');return;}
-  }
+
+  // Cek saldo
+  let total=0;
+  if(ms)total+=HARGA.sarapan;if(msi)total+=HARGA.siang;if(mso)total+=HARGA.sore;if(mm)total+=HARGA.malam;
+  if(mySaldo!==null&&mySaldo<total){showAlertForm(`Saldo tidak cukup! Saldo kamu ¥${mySaldo}, perlu ¥${total}`,'danger');return;}
 
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;btn.textContent='Mengirim... 🌸';
