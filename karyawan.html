@@ -519,15 +519,16 @@ function renderMenuForm(){
     const items=currentMenus[cat]||[];
     if(!items.length)return '';
     return `<div class="waktu-label">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
-    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];const sel=selectedMenus[cat]===m;return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
+    <div class="menu-grid">${items.map(m=>{const sel=Array.isArray(selectedMenus[cat])&&selectedMenus[cat].includes(m);return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
   }).join('');
   document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
 }
 
 function pilihMenu(cat,nama,el){
-  selectedMenus[cat]=selectedMenus[cat]===nama?'':nama;
-  el.closest('.menu-grid').querySelectorAll('.menu-item').forEach(c=>c.classList.remove('selected'));
-  if(selectedMenus[cat])el.classList.add('selected');
+  if(!Array.isArray(selectedMenus[cat]))selectedMenus[cat]=[];
+  const idx=selectedMenus[cat].indexOf(nama);
+  if(idx>=0){selectedMenus[cat].splice(idx,1);el.classList.remove('selected');}
+  else{selectedMenus[cat].push(nama);el.classList.add('selected');}
   hitungTotalHarga();
 }
 
