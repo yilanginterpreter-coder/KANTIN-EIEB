@@ -192,20 +192,7 @@ textarea{resize:none}
     </div>
 
     <!-- SENDOK / SARUNG TANGAN -->
-    <div class="card">
-      <div class="card-title">♻️ Alat Makan (Opsional)</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Hemat plastik = jaga lingkungan 🌿</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
-          <input type="checkbox" id="pakai-sendok" style="width:18px;height:18px;accent-color:var(--pink)">
-          <div><div style="font-size:13px;font-weight:600">🥄 Pakai Sendok Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sendok plastik</div></div>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;border:1.5px solid var(--border);border-radius:10px">
-          <input type="checkbox" id="pakai-sarung" style="width:18px;height:18px;accent-color:var(--pink)">
-          <div><div style="font-size:13px;font-weight:600">🧤 Pakai Sarung Tangan Plastik</div><div style="font-size:11px;color:var(--text2)">Centang jika butuh sarung tangan</div></div>
-        </label>
-      </div>
-    </div>
+    
 
         <div class="card">
       <div class="card-title">🥄 Perlengkapan Makan</div>
@@ -364,7 +351,7 @@ const menuLabel={sarapan:'Sarapan',siang:'Makan Siang',sore:'Makan Sore',malam:'
 const menuEmoji={sarapan:'🌅',siang:'☀️',sore:'🌆',malam:'🌙'};
 
 let karyawanDB=[], orderIsOpen=false, allPesanan={}, currentMenus={...defaultMenus}, menuFotos={};
-let selectedMenus={sarapan:'',siang:'',sore:'',malam:''};
+let selectedMenus={sarapan:[],siang:[],sore:[],malam:[]};
 let caraMakan='ditempat', lokasiTakeaway=[], onlineUsers={};
 let mySessionKey=null, mySaldo=null;
 
@@ -446,7 +433,7 @@ function updateSaldoUI(){
 
 function hitungTotalHarga(){
   let total=0;
-  Object.entries(selectedMenus).forEach(([cat,nama])=>{if(nama) total+=HARGA[cat]||0;});
+  Object.entries(selectedMenus).forEach(([cat,arr])=>{if(Array.isArray(arr)&&arr.length) total+=(HARGA[cat]||0)*arr.length;});
   document.getElementById('total-harga').textContent='Total: ¥'+total;
   const saldoAfter=mySaldo!==null?mySaldo-total:null;
   document.getElementById('saldo-after').textContent=saldoAfter!==null?'Setelah pesan: ¥'+saldoAfter.toFixed(0):'Setelah pesan: ¥ —';
@@ -519,7 +506,7 @@ function renderMenuForm(){
     const items=currentMenus[cat]||[];
     if(!items.length)return '';
     return `<div class="waktu-label">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
-    <div class="menu-grid">${items.map(m=>{const sel=Array.isArray(selectedMenus[cat])&&selectedMenus[cat].includes(m);return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
+    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];const sel=Array.isArray(selectedMenus[cat])&&selectedMenus[cat].includes(m);return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
   }).join('');
   document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
 }
@@ -637,7 +624,10 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
   const nama=document.getElementById('nama-input').value;
   const dept=document.getElementById('dept-input').value;
   if(!id||!nama){showAlertForm('Masukkan ID Card yang valid!','danger');return;}
-  const ms=selectedMenus.sarapan,msi=selectedMenus.siang,mso=selectedMenus.sore,mm=selectedMenus.malam;
+  const ms=selectedMenus.sarapan&&selectedMenus.sarapan.length?selectedMenus.sarapan.join(','):null;
+  const msi=selectedMenus.siang&&selectedMenus.siang.length?selectedMenus.siang.join(','):null;
+  const mso=selectedMenus.sore&&selectedMenus.sore.length?selectedMenus.sore.join(','):null;
+  const mm=selectedMenus.malam&&selectedMenus.malam.length?selectedMenus.malam.join(','):null;
   if(!ms&&!msi&&!mso&&!mm){showAlertForm('Pilih minimal satu menu!','danger');return;}
 
   // Cek take away
@@ -698,7 +688,7 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
 document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
   document.getElementById('sukses-pesan').style.display='none';
   document.getElementById('form-pesan').style.display='block';
-  selectedMenus={sarapan:'',siang:'',sore:'',malam:''};
+  selectedMenus={sarapan:[],siang:[],sore:[],malam:[]};
   perlengkapan={sendok:false,sarung:false};
   ['sendok','sarung'].forEach(t=>{
     const btn=document.getElementById('btn-'+t);
