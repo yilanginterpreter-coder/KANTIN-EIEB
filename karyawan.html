@@ -379,7 +379,7 @@ function togglePeralatan(jenis) {
 }
 
 // PERLENGKAPAN MAKAN
-let perlengkapan = {sendokplastik: false, sarungtanganplastik: false};
+let perlengkapan = {sendok: false, sarung: false};
 
 function togglePerlengkapan(type) {
 
@@ -387,7 +387,7 @@ function togglePerlengkapan(type) {
     perlengkapan[key] = false;
 
     const btn = document.getElementById('btn-' + key);
-    const label = key === 'sendok' ? 'Sendok' : 'Sarung Tangan Plastik';
+    const label = key === 'sendok' ? 'Sendok Plastik' : 'Sarung Tangan Plastik';
     const emoji = key === 'sendok' ? '🥄' : '🧤';
 
     btn.style.cssText = 'border:2px solid var(--border);background:#fff;border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
@@ -397,7 +397,7 @@ function togglePerlengkapan(type) {
   perlengkapan[type] = true;
 
   const btn = document.getElementById('btn-' + type);
-  const label = type === 'sendok' ? 'Sendok' : 'Sarung Tangan';
+  const label = type === 'sendok' ? 'Sendok Plastik' : 'Sarung Tangan';
   const emoji = type === 'sendok' ? '🥄' : '🧤';
 
   btn.style.cssText = 'border:2px solid var(--pink);background:var(--pink-light);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
