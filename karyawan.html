@@ -366,19 +366,6 @@ if(savedProfil.id){
 const savedFoto=localStorage.getItem('kantin_foto_profil');
 if(savedFoto) setAvatarImg(savedFoto);
 
-// PERALATAN MAKAN
-let peralatan = {sendok: false, sarung: false};
-
-function togglePeralatan(jenis) {
-  peralatan[jenis] = !peralatan[jenis];
-  const btn = document.getElementById('btn-' + jenis);
-  if(peralatan[jenis]) {
-    btn.style.cssText = 'border:2px solid var(--pink);background:var(--pink-light);color:var(--pink-dark);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
-  } else {
-    btn.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
-  }
-}
-
 // PERLENGKAPAN MAKAN
 let perlengkapan = {sendok: false, sarung: false};
 
@@ -647,16 +634,23 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
     }
     const lokasi=caraMakan==='takeaway'?document.getElementById('lokasi-select').value:'Kantin';
    const pesananBaru={
-  id,nama,dept,
-  caraMakan:caraMakan,
-  lokasi:lokasi,sendok:perlengkapan.sendok,sarungTangan:perlengkapan.sarung,sendok:peralatan.sendok,sarungTangan:peralatan.sarung,sarapan:ms||null,siang:msi||null,sore:mso||null,malam:mm||null,
-      caraMakan,lokasi,
-      sendok:document.getElementById('pakai-sendok').checked,
-      sarungTangan:document.getElementById('pakai-sarung').checked,
-      totalHarga:total,
-      saran:document.getElementById('saran').value||null,
-      keluhan:document.getElementById('keluhan').value||null,
-      tanggal:today,timestamp:new Date().toISOString()};
+  id,
+  nama,
+  dept,
+  caraMakan,
+  lokasi,
+  sendok: perlengkapan.sendok,
+  sarungTangan: perlengkapan.sarung,
+  sarapan: ms||null,
+  siang: msi||null,
+  sore: mso||null,
+  malam: mm||null,
+  totalHarga: total,
+  saran: document.getElementById('saran').value||null,
+  keluhan: document.getElementById('keluhan').value||null,
+  tanggal: today,
+  timestamp: new Date().toISOString()
+};
     await db.ref('pesanan').push(pesananBaru);
     // Potong saldo
     if(totalHarga > 0) {
@@ -697,7 +691,6 @@ document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
   });
   renderMenuForm();hitungTotalHarga();
   document.getElementById('saran').value='';document.getElementById('keluhan').value='';
-  document.getElementById('pakai-sendok').checked=false;document.getElementById('pakai-sarung').checked=false;
   setCaraMakan('ditempat');
   peralatan = {sendok: false, sarung: false};
   ['sendok','sarung'].forEach(j => {
