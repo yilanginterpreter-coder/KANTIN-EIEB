@@ -646,7 +646,10 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
       if(sudah){showAlertForm('Kamu sudah memesan hari ini!','danger');btn.disabled=false;btn.textContent='Kirim Pesanan 🌸';return;}
     }
     const lokasi=caraMakan==='takeaway'?document.getElementById('lokasi-select').value:'Kantin';
-    const pesananBaru={id,nama,dept,caraMakan:caraMakan,lokasi:lokasiDipilih?lokasiDipilih.nama:null,sendok:perlengkapan.sendok,sarungTangan:perlengkapan.sarung,sendok:peralatan.sendok,sarungTangan:peralatan.sarung,sarapan:ms||null,siang:msi||null,sore:mso||null,malam:mm||null,
+   const pesananBaru={
+  id,nama,dept,
+  caraMakan:caraMakan,
+  lokasi:lokasi,sendok:perlengkapan.sendok,sarungTangan:perlengkapan.sarung,sendok:peralatan.sendok,sarungTangan:peralatan.sarung,sarapan:ms||null,siang:msi||null,sore:mso||null,malam:mm||null,
       caraMakan,lokasi,
       sendok:document.getElementById('pakai-sendok').checked,
       sarungTangan:document.getElementById('pakai-sarung').checked,
