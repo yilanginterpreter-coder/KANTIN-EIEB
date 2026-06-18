@@ -673,11 +673,11 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
     document.getElementById('form-pesan').style.display='none';
     document.getElementById('sukses-pesan').style.display='block';
   }catch(e){
-   console.error(e);
+   console.error('ERROR KIRIM PESANAN:', e);
    showAlertForm('Gagal mengirim. Coba lagi!','danger');
+   btn.disabled=false;
+   btn.textContent='Kirim Pesanan 🌸';
 }
-    btn.disabled=false;btn.textContent='Kirim Pesanan 🌸';
-  }
 });
 
 document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
