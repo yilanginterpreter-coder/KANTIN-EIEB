@@ -652,14 +652,7 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
   timestamp: new Date().toISOString()
 };
     await db.ref('pesanan').push(pesananBaru);
-    // Potong saldo
-    if(totalHarga > 0) {
-      const profil = JSON.parse(localStorage.getItem('kantin_profil')||'{}');
-      if(profil.id) {
-        const newSaldo = Math.max(0, mySaldo - totalHarga);
-        await db.ref('saldo/'+profil.id).set(newSaldo);
-      }
-    }
+    
     // Potong saldo
     if(mySaldo!==null){
       const newSaldo=mySaldo-total;
@@ -692,7 +685,7 @@ document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
   renderMenuForm();hitungTotalHarga();
   document.getElementById('saran').value='';document.getElementById('keluhan').value='';
   setCaraMakan('ditempat');
-  peralatan = {sendok: false, sarung: false};
+  perlengkapan = {sendok:false, sarung:false};
   ['sendok','sarung'].forEach(j => {
     const b = document.getElementById('btn-'+j);
     if(b) b.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
