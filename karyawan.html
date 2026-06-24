@@ -256,6 +256,12 @@ textarea{resize:none}
     <div class="avatar-wrap" >
       <div id="avatar-display" class="avatar-default">🍱</div>
       <div class="avatar-edit-btn">📷</div>
+    </div>
+    <input type="file" id="foto-profil-input" accept="image/*" style="display:none" disabled>
+    <div id="profil-nama-display" style="font-size:18px;font-weight:700;color:var(--pink-dark)">—</div>
+    <div id="profil-dept-display" style="font-size:13px;color:var(--text2);margin-top:2px">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">Ketuk foto untuk ganti 📷</div>
+  </div>
 
   <div class="saldo-card" id="saldo-card-profil">
     <div style="font-size:12px;opacity:0.85">💰 Saldo Kamu</div>
@@ -646,7 +652,14 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
   timestamp: new Date().toISOString()
 };
     await db.ref('pesanan').push(pesananBaru);
-    
+    // Potong saldo
+    if(totalHarga > 0) {
+      const profil = JSON.parse(localStorage.getItem('kantin_profil')||'{}');
+      if(profil.id) {
+        const newSaldo = Math.max(0, mySaldo - totalHarga);
+        await db.ref('saldo/'+profil.id).set(newSaldo);
+      }
+    }
     // Potong saldo
     if(mySaldo!==null){
       const newSaldo=mySaldo-total;
@@ -679,7 +692,7 @@ document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
   renderMenuForm();hitungTotalHarga();
   document.getElementById('saran').value='';document.getElementById('keluhan').value='';
   setCaraMakan('ditempat');
-  perlengkapan = {sendok:false, sarung:false};
+  peralatan = {sendok: false, sarung: false};
   ['sendok','sarung'].forEach(j => {
     const b = document.getElementById('btn-'+j);
     if(b) b.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
