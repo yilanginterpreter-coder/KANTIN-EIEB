@@ -4,8 +4,8 @@
   "description": "Sistem Pemesanan Makan Karyawan",
   "start_url": "/karyawan.html",
   "display": "standalone",
-  "background_color": "#fff0f5",
-  "theme_color": "#e91e8c",
+  "background_color": "#e91e8c",
+"theme_color": "#e91e8c",
   "orientation": "portrait",
   "icons": [
     {
