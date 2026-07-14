@@ -108,7 +108,7 @@ textarea{resize:none}
     <span id="online-count" style="color:rgba(255,255,255,0.9);font-size:12px">0 karyawan online</span>
   </div>
 </div>
-<div id="order-bar" class="order-bar closed">🔒 Order Sedang Ditutup</div>
+<div id="order-bar" class="order-bar closed"> Order Sedang Ditutup</div>
 <div id="alert-global" style="padding:0 16px"></div>
 
 <!-- TAB MENU -->
@@ -121,7 +121,6 @@ textarea{resize:none}
   <!-- ONLINE USERS BANNER -->
   <div class="card" style="margin-bottom:12px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-size:13px;font-weight:700;color:var(--pink-dark)">👥 Sedang Online</div>
       <div id="online-count-badge" style="background:var(--pink);color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700">0</div>
     </div>
     <div id="online-users-list" style="display:flex;flex-wrap:wrap;gap:8px">
@@ -137,7 +136,7 @@ textarea{resize:none}
   <div id="alert-form"></div>
   <div id="closed-notice" style="display:none">
     <div class="card" style="text-align:center;padding:2rem">
-      <div style="font-size:48px;margin-bottom:8px">🔒</div>
+      <div style="font-size:48px;margin-bottom:8px"></div>
       <div style="font-size:16px;font-weight:700;color:#c62828;margin-bottom:6px">Order Ditutup</div>
       <div style="font-size:13px;color:var(--text2)">Tunggu hingga order dibuka kembali</div>
     </div>
@@ -229,16 +228,6 @@ textarea{resize:none}
       <div id="sukses-saldo" style="font-size:14px;font-weight:700;color:var(--pink-dark);margin-bottom:1.5rem"></div>
       <button class="btn btn-outline" id="btn-pesan-lagi" style="max-width:180px;margin:0 auto">Pesan Lagi</button>
     </div>
-  </div>
-</div>
-
-<!-- TAB ONLINE -->
-<div id="tab-online" class="tab-content">
-  <div class="card">
-    <div class="card-title">👥 Karyawan Sedang Online</div>
-    <div id="online-count-big" style="font-size:28px;font-weight:800;color:var(--pink);margin-bottom:4px">0</div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">karyawan aktif sekarang</div>
-    <div id="online-grid" class="online-grid"></div>
   </div>
 </div>
 
@@ -453,8 +442,8 @@ db.ref('karyawan').on('value',s=>{if(s.val())karyawanDB=Object.values(s.val());}
 db.ref('settings/orderOpen').on('value',s=>{
   orderIsOpen=s.val()===true||s.val()==='true';
   const bar=document.getElementById('order-bar');
-  if(orderIsOpen){bar.className='order-bar open';bar.textContent='🟢 Order Dibuka — Silakan Pesan!';}
-  else{bar.className='order-bar closed';bar.textContent='🔒 Order Sedang Ditutup';}
+  if(orderIsOpen){bar.className='order-bar open';bar.textContent=' Order Dibuka — Silakan Pesan!';}
+  else{bar.className='order-bar closed';bar.textContent=' Order Sedang Ditutup';}
   document.getElementById('closed-notice').style.display=orderIsOpen?'none':'block';
   document.getElementById('form-pesan').style.display=orderIsOpen?'block':'none';
 });
