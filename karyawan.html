@@ -427,7 +427,7 @@ db.ref('karyawan').on('value',s=>{if(s.val())karyawanDB=Object.values(s.val());}
 db.ref('settings/orderOpen').on('value',s=>{
   orderIsOpen=s.val()===true||s.val()==='true';
   const bar=document.getElementById('order-bar');
-  if(orderIsOpen){bar.className='order-bar open';bar.textContent=' Order Dibuka — Silakan Pesan!';}
+  if(orderIsOpen){bar.className='order-bar open';bar.textContent=' Order Dibuka Silakan Pesan!';}
   else{bar.className='order-bar closed';bar.textContent=' Order Sedang Ditutup';}
   document.getElementById('closed-notice').style.display=orderIsOpen?'none':'block';
   document.getElementById('form-pesan').style.display=orderIsOpen?'block':'none';
