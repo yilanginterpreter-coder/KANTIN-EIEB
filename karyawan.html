@@ -443,23 +443,35 @@ db.ref('settings/lokasiTakeaway').on('value',s=>{
 function menuKey(nama){return btoa(unescape(encodeURIComponent(nama))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');}
 
 // RENDER MENU TAB
-function renderMenuDisplay(){
-  const html=Object.entries(menuLabel).map(([cat,label])=>{
-    const items=currentMenus[cat]||[];
-    if(!items.length)return '';
-    return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
-    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];return`<div class="menu-item"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><div class="menu-item-price">¥${HARGA[cat]}</div></div></div>`;}).join('')}</div>`;
-  }).join('');
-  document.getElementById('menu-display').innerHTML=html||'<div class="empty"><div class="empty-icon">🍽️</div>Belum ada menu</div>';
-}
-
 function renderMenuForm(){
   const html=Object.entries(menuLabel).map(([cat,label])=>{
     const items=currentMenus[cat]||[];
     if(!items.length)return '';
-    return `<div class="waktu-label">${menuEmoji[cat]} ${label} <span style="font-weight:500;font-size:11px;color:var(--text2)">¥${HARGA[cat]}/porsi</span></div>
-    <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];const sel=Array.isArray(selectedMenus[cat])&&selectedMenus[cat].includes(m);return`<div class="menu-item ${sel?'selected':''}" onclick="pilihMenu('${cat}','${m}',this)"><div class="menu-item-img">${foto?`<img src="${foto}" alt="${m}">`:'🍛'}</div><div class="menu-item-body"><div class="menu-item-name">${m}</div><span class="selected-check">✅</span></div></div>`;}).join('')}</div>`;
-  }).join('');
+   return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">
+  ${menuEmoji[cat]} ${label}
+</div>
+<div class="menu-grid">${items.map(m=>{
+  const foto=menuFotos[menuKey(m)];
+  return`<div class="menu-item"><img src="${foto}">
+  <b>${m.nama}</b>
+  <p>¥${m.harga}</p>
+</div>`
+}).join('')}</div>`; // <-- ini ditutup
+  }).join(''); // <-- ini juga
+  
+  document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
+}
+function renderMenuForm(){
+  const html=Object.entries(menuLabel).map(([cat,label])=>{
+    const items=currentMenus[cat]||[];
+    if(!items.length)return '';
+   return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">
+  ${menuEmoji[cat]} ${label}
+</div>
+<div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];return`<div class="menu-item"><img src="${foto}">
+  <b>${m.nama}</b>
+  <p>¥${m.harga}</p> // harga per menu
+</div>`}).join('')}`;
   document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
 }
 
@@ -631,7 +643,6 @@ document.getElementById('btn-submit').addEventListener('click',async()=>{
       await db.ref('saldo/'+id).set(newSaldo);
       document.getElementById('sukses-saldo').textContent=`Saldo terpotong ¥${total} → Sisa ¥${newSaldo}`;
     }
-    await kirimNotifWA(pesananBaru);
     document.getElementById('form-pesan').style.display='none';
     document.getElementById('sukses-pesan').style.display='block';
   }catch(e){
@@ -663,20 +674,7 @@ document.getElementById('btn-pesan-lagi').addEventListener('click',()=>{
     if(b) b.style.cssText = 'border:2px solid var(--border);background:#fff;color:var(--text);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all 0.2s';
   });
   document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Kirim Pesanan 🌸';
-});async function kirimNotifWA(p){
-  try{
-    const msg=`🌸 *PESANAN MASUK — KANTIN EIEB*\n\n👤 *${p.nama}*\n🪪 ID: ${p.id} | ${p.dept}\n🕐 ${new Date().toLocaleTimeString('id-ID')}\n${p.caraMakan==='takeaway'?'🥡 TAKE AWAY - Lokasi: '+p.lokasi:'🍽️ Makan di Tempat'}\n\n📋 *Menu:*\n`+
-      (p.sarapan?`🌅 Sarapan: ${p.sarapan} (¥${HARGA.sarapan})\n`:'')+
-      (p.siang?`☀️ Siang: ${p.siang} (¥${HARGA.siang})\n`:'')+
-      (p.sore?`🌆 Sore: ${p.sore} (¥${HARGA.sore})\n`:'')+
-      (p.malam?`🌙 Malam: ${p.malam} (¥${HARGA.malam})\n`:'')+
-      `💰 Total: ¥${p.totalHarga}\n`+
-      (p.sendok?'🥄 Butuh sendok\n':'')+(p.sarungTangan?'🧤 Butuh sarung tangan\n':'')+
-      (p.saran?`\n💬 Saran: ${p.saran}`:'')+
-      (p.keluhan?`\n⚠️ Keluhan: ${p.keluhan}`:'');
-    await fetch('https://api.fonnte.com/send',{method:'POST',headers:{'Authorization':FONNTE_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({target:GRUP_ID,message:msg})});
-  }catch(e){}
-}
+});
 
 function renderRiwayat(){
   const profil=JSON.parse(localStorage.getItem('kantin_profil')||'{}');
@@ -738,7 +736,7 @@ function showAlertForm(msg,type='success'){
 });
 
 // PWA
-let deferredPrompt=null;
+let menus = JSON.parse(localStorage.getItem('menus')) || [];let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('install-banner').style.display='flex';});
 function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.then(()=>{deferredPrompt=null;document.getElementById('install-banner').style.display='none';});}}
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
