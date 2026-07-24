@@ -470,7 +470,7 @@ function renderMenuForm(){
 </div>
 <div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];return`<div class="menu-item"><img src="${foto}">
   <b>${m.nama}</b>
-  <p>¥${m.harga}</p> // harga per menu
+  <p>¥${m.harga}</p>
 </div>`}).join('')}`;
   document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
 }
