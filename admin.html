@@ -347,13 +347,14 @@ input[readonly]{background:#fdf0f5;color:var(--text2)}
   <div class="modal-title">✏️ Edit Menu</div>
   <input type="hidden" id="edit-menu-cat"><input type="hidden" id="edit-menu-idx">
   <div class="form-group"><label>Nama Menu</label><input type="text" id="edit-menu-nama"></div>
+  <div class="form-group"><label>Harga (¥)</label><input type="number" id="edit-menu-harga" min="0"></div> <!-- TAMBAH INI -->
   <div class="form-group"><label>Kategori</label>
     <select id="edit-menu-kat" style="background:white; position:relative; z-index:10">
-  <option value="sarapan">Sarapan</option>
-  <option value="siang">Makan Siang</option>
-  <option value="sore">Makan Sore</option>
-  <option value="malam">Makan Malam</option>
-</select>
+      <option value="sarapan">Sarapan</option>
+      <option value="siang">Makan Siang</option>
+      <option value="sore">Makan Sore</option>
+      <option value="malam">Makan Malam</option>
+    </select>
   </div>
   <div class="modal-actions"><button class="btn" id="btn-batal-menu">Batal</button><button class="btn btn-pink" id="btn-simpan-menu">Simpan</button></div>
 </div></div>
@@ -472,7 +473,6 @@ function updateOrderBanner(){
   if(orderIsOpen){b.className="order-toggle open";ic.textContent="🟢";ti.textContent="Order Sedang Dibuka";su.textContent="Karyawan dapat memesan";su.style.color="#2e7d32";bt.textContent="Tutup Order";bt.className="btn btn-danger";}
   else{b.className="order-toggle closed";ic.textContent="🔒";ti.textContent="Order Ditutup";su.textContent="Karyawan tidak bisa memesan";su.style.color="#c62828";bt.textContent="Buka Order";bt.className="btn btn-success";}
 }
-async function kirimWA(msg){try{await fetch("https://api.fonnte.com/send",{method:"POST",headers:{"Authorization":FONNTE_TOKEN,"Content-Type":"application/json"},body:JSON.stringify({target:GRUP_ID,message:msg})});}catch(e){}}
 
 // LISTENERS
 function startListening(){
@@ -573,11 +573,72 @@ function bukaEditStok(key){const s=allStok[key];document.getElementById("edit-st
 function hapusStok(key){if(!confirm("Hapus bahan ini?"))return;db.ref("stok/"+key).remove();}
 
 // MENU
-function renderDaftarMenu(){const cats={sarapan:"Sarapan",siang:"Makan Siang",sore:"Makan Sore",malam:"Makan Malam"};let html="";Object.entries(currentMenus).forEach(([cat,items])=>{(items||[]).forEach((item,i)=>{html+=`<div class="menu-card"><div style="font-size:12px;font-weight:700;margin-bottom:3px">${item}</div><div style="font-size:10px;color:var(--text2);margin-bottom:8px">${cats[cat]}</div><div style="display:flex;gap:4px"><button class="btn btn-sm" onclick="bukaEditMenu('${cat}',${i})">Edit</button><button class="btn btn-sm btn-danger" onclick="hapusMenu('${cat}',${i})">Hapus</button></div></div>`;});});document.getElementById("daftar-menu").innerHTML=html||'<div class="empty">Belum ada menu</div>';}
-document.getElementById("btn-tambah-menu").addEventListener("click",async()=>{const nama=document.getElementById("menu-baru-nama").value.trim().toUpperCase(),kat=document.getElementById("menu-baru-kat").value;if(!nama){showAlert("menu","Nama menu tidak boleh kosong!","danger");return;}const u={...currentMenus};if(!u[kat])u[kat]=[];if(u[kat].includes(nama)){showAlert("menu","Menu sudah ada!","danger");return;}u[kat].push(nama);await db.ref("menus").set(u);document.getElementById("menu-baru-nama").value="";showAlert("menu","Menu berhasil ditambahkan!");});
-function bukaEditMenu(cat,idx){document.getElementById("edit-menu-cat").value=cat;document.getElementById("edit-menu-idx").value=idx;document.getElementById("edit-menu-nama").value=currentMenus[cat][idx];document.getElementById("edit-menu-kat").value=cat;document.getElementById("modal-menu").classList.add("open");}
-function hapusMenu(cat,idx){if(!confirm("Hapus menu ini?"))return;const u={...currentMenus};u[cat].splice(idx,1);db.ref("menus").set(u);}
-document.getElementById("btn-simpan-menu").addEventListener("click",async()=>{const cat=document.getElementById("edit-menu-cat").value,idx=parseInt(document.getElementById("edit-menu-idx").value),newNama=document.getElementById("edit-menu-nama").value.trim().toUpperCase(),newKat=document.getElementById("edit-menu-kat").value;if(!newNama)return;const u={...currentMenus};u[cat].splice(idx,1);if(!u[newKat])u[newKat]=[];u[newKat].push(newNama);await db.ref("menus").set(u);document.getElementById("modal-menu").classList.remove("open");});
+function renderDaftarMenu(){
+  const cats={sarapan:"Sarapan",siang:"Makan Siang",sore:"Makan Sore",malam:"Makan Malam"};
+  let html="";
+  Object.entries(currentMenus).forEach(([cat,items])=>{
+    (items||[]).forEach((item,i)=>{
+      const nama = typeof item === 'string'? item : item.nama; // support data lama
+      const harga = typeof item === 'string'? 0 : item.harga;
+      html+=`<div class="menu-card">
+        <div style="font-size:12px;font-weight:700;margin-bottom:3px">${nama}</div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:3px">${cats[cat]}</div>
+        <div style="font-size:11px;color:var(--pink);font-weight:700;margin-bottom:8px">¥${harga.toLocaleString()}</div> <!-- TAMBAH HARGA -->
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm" onclick="bukaEditMenu('${cat}',${i})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="hapusMenu('${cat}',${i})">Hapus</button>
+        </div>
+      </div>`;
+    });
+  });
+  document.getElementById("daftar-menu").innerHTML=html||'<div class="empty">Belum ada menu</div>';
+}
+
+document.getElementById("btn-tambah-menu").addEventListener("click",async()=>{
+  const nama=document.getElementById("menu-baru-nama").value.trim().toUpperCase();
+  const harga=parseInt(document.getElementById("menu-baru-harga").value)||0;
+  const kat=document.getElementById("kategori-menu").value; // id nya ini ya
+  if(!nama){showAlert("menu","Nama menu tidak boleh kosong!","danger");return;}
+  if(!kat){showAlert("menu","Pilih kategori dulu!","danger");return;}
+  const u={...currentMenus};if(!u[kat])u[kat]=[];
+  if(u[kat].some(m=> (typeof m==='string'?m:m.nama) === nama)){showAlert("menu","Menu sudah ada!","danger");return;}
+  u[kat].push({nama, harga}); // simpan jadi object
+  await db.ref("menus").set(u);
+  document.getElementById("menu-baru-nama").value="";
+  document.getElementById("menu-baru-harga").value="";
+  showAlert("menu","Menu berhasil ditambahkan!");
+});
+
+function bukaEditMenu(cat,idx){
+  const menu = currentMenus[cat][idx];
+  document.getElementById("edit-menu-cat").value=cat;
+  document.getElementById("edit-menu-idx").value=idx;
+  document.getElementById("edit-menu-nama").value= typeof menu === 'string'? menu : menu.nama;
+  document.getElementById("edit-menu-harga").value= typeof menu === 'string'? 0 : menu.harga; // ISI HARGA
+  document.getElementById("edit-menu-kat").value=cat;
+  document.getElementById("modal-menu").classList.add("open");
+}
+
+function hapusMenu(cat,idx){
+  if(!confirm("Hapus menu ini?"))return;
+  const u={...currentMenus};u[cat].splice(idx,1);db.ref("menus").set(u);
+}
+
+document.getElementById("btn-simpan-menu").addEventListener("click",async()=>{
+  const cat=document.getElementById("edit-menu-cat").value;
+  const idx=parseInt(document.getElementById("edit-menu-idx").value);
+  const newNama=document.getElementById("edit-menu-nama").value.trim().toUpperCase();
+  const newHarga=parseInt(document.getElementById("edit-menu-harga").value)||0;
+  const newKat=document.getElementById("edit-menu-kat").value;
+  if(!newNama)return;
+  const u={...currentMenus};
+  u[cat].splice(idx,1);
+  if(!u[newKat])u[newKat]=[];
+  u[newKat].push({nama:newNama, harga:newHarga}); // update jadi object
+  await db.ref("menus").set(u);
+  document.getElementById("modal-menu").classList.remove("open");
+});
+
 document.getElementById("btn-batal-menu").addEventListener("click",()=>document.getElementById("modal-menu").classList.remove("open"));
 
 // FOTO MENU
