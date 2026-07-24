@@ -424,7 +424,7 @@ function renderOnline(){
 
 // FIREBASE LISTENERS
 db.ref('karyawan').on('value',s=>{if(s.val())karyawanDB=Object.values(s.val());});
-db.ref('settings/isOpen').on('value',s=>{
+db.ref('settings/orderopen').on('value',s=>{
   orderIsOpen=s.val()===true||s.val()==='true';
   const bar=document.getElementById('order-bar');
   if(orderIsOpen){bar.className='order-bar open';bar.textContent=' Order Dibuka Silakan Pesan!';}
