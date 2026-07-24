@@ -467,6 +467,10 @@ document.getElementById("order-btn").addEventListener("click",async()=>{
   await db.ref("settings/orderOpen").set(n);
   kirimWA(n?"🟢 *ORDER DIBUKA — KANTIN EIEB*\n\nPemesanan dibuka! Segera pesan 🌸":"🔒 *ORDER DITUTUP — KANTIN EIEB*\n\nPemesanan ditutup. Terima kasih! 🌸");
 });
+  db.ref("settings/orderOpen").on("value",s=>{
+  orderIsOpen = s.val()===true || s.val()==='true';
+  updateOrderBanner(); // biar banner langsung update
+});
 function updateOrderBanner(){
   const b=document.getElementById("order-banner"),ic=document.getElementById("order-icon"),ti=document.getElementById("order-title"),su=document.getElementById("order-sub"),bt=document.getElementById("order-btn");
   if(orderIsOpen){b.className="order-toggle open";ic.textContent="🟢";ti.textContent="Order Sedang Dibuka";su.textContent="Karyawan dapat memesan";su.style.color="#2e7d32";bt.textContent="Tutup Order";bt.className="btn btn-danger";}
