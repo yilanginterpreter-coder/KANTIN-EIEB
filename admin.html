@@ -216,14 +216,14 @@ input[readonly]{background:#fdf0f5;color:var(--text2)}
   <div class="form-group"><label>Nama Menu</label><input type="text" id="menu-baru-nama"></div>
   <div class="form-group"><label>Harga (¥)</label><input type="number" id="menu-baru-harga" min="0"></div>
   <div class="form-group"><label>Kategori</label>
-    <select id="menu-baru-kat">
-      <select id="menu-baru-kat">
-  <option value="sarapan">Sarapan</option>
-  <option value="siang">Makan Siang</option>
-  <option value="sore">Makan Sore</option>
-  <option value="malam">Makan Malam</option>
-</select>
-  </div>
+    <select id="kategori-menu" style="background:white; position:relative; z-index:10">
+    <option value="">Pilih Kategori</option>
+    <option value="sarapan">Sarapan</option>
+    <option value="siang">Makan Siang</option>
+    <option value="sore">Makan Sore</option>
+    <option value="malam">Makan Malam</option>
+  </select>
+</div>
 </div>
 <button class="btn btn-pink" id="btn-tambah-menu">+ Tambah Menu</button>
 <div id="daftar-menu" class="menu-grid-admin"></div>
@@ -348,7 +348,12 @@ input[readonly]{background:#fdf0f5;color:var(--text2)}
   <input type="hidden" id="edit-menu-cat"><input type="hidden" id="edit-menu-idx">
   <div class="form-group"><label>Nama Menu</label><input type="text" id="edit-menu-nama"></div>
   <div class="form-group"><label>Kategori</label>
-    <select id="edit-menu-kat"><option value="sarapan">Sarapan</option><option value="siang">Makan Siang</option><option value="sore">Makan Sore</option><option value="malam">Makan Malam</option></select>
+    <select id="edit-menu-kat" style="background:white; position:relative; z-index:10">
+  <option value="sarapan">Sarapan</option>
+  <option value="siang">Makan Siang</option>
+  <option value="sore">Makan Sore</option>
+  <option value="malam">Makan Malam</option>
+</select>
   </div>
   <div class="modal-actions"><button class="btn" id="btn-batal-menu">Batal</button><button class="btn btn-pink" id="btn-simpan-menu">Simpan</button></div>
 </div></div>
