@@ -465,13 +465,16 @@ function renderMenuForm(){
   const html=Object.entries(menuLabel).map(([cat,label])=>{
     const items=currentMenus[cat]||[];
     if(!items.length)return '';
-   return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">
-  ${menuEmoji[cat]} ${label}
+  return `<div style="font-size:13px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.8px;margin:14px 0 8px">
+${menuEmoji[cat]} ${label}
 </div>
-<div class="menu-grid">${items.map(m=>{const foto=menuFotos[menuKey(m)];return`<div class="menu-item"><img src="${foto}">
-  <b>${m.nama}</b>
-  <p>¥${m.harga}</p>
-</div>`}).join('')}`;
+<div class="menu-grid">${items.map(m=>{
+const foto=menuFotos[menuKey(m)];
+return `<div class="menu-item"><img src="${foto}">
+<b>${m.nama}</b>
+<p>¥${m.harga}</p>
+</div>`
+}).join('')}</div>`
   document.getElementById('menu-form-display').innerHTML=html||'<div class="empty">Belum ada menu</div>';
 }
 
