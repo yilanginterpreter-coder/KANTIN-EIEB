@@ -464,10 +464,10 @@ document.getElementById("btn-keluar").addEventListener("click",()=>{
 // ORDER
 document.getElementById("order-btn").addEventListener("click",async()=>{
   const n=!orderIsOpen;
-  await db.ref("settings/orderopen").set(n);
+  await db.ref("settings/orderOpen").set(n);
   kirimWA(n?"🟢 *ORDER DIBUKA — KANTIN EIEB*\n\nPemesanan dibuka! Segera pesan 🌸":"🔒 *ORDER DITUTUP — KANTIN EIEB*\n\nPemesanan ditutup. Terima kasih! 🌸");
 });
-  db.ref("settings/orderopen").on("value",s=>{
+  db.ref("settings/orderOpen").on("value",s=>{
   orderIsOpen = s.val()===true || s.val()==='true';
   updateOrderBanner(); // biar banner langsung update
 });
@@ -479,7 +479,7 @@ function updateOrderBanner(){
 
 // LISTENERS
 function startListening(){
-  db.ref("settings/orderopen").on("value",s=>{orderIsOpen=s.val()||false;updateOrderBanner();});
+  db.ref("settings/orderOpen").on("value",s=>{orderIsOpen=s.val()||false;updateOrderBanner();});
   db.ref("pesanan").on("value",s=>{allPesanan=s.val()||{};renderDashboard();renderPesanan();renderStokPemakaian();});
   db.ref("menus").on("value",s=>{currentMenus=s.val()||{...defaultMenus};renderDaftarMenu();updateFotoMenuSelect();});
   db.ref("karyawan").on("value",s=>{allKaryawan=s.val()||{};renderKaryawan();});
